@@ -1,31 +1,22 @@
 package utils
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"myproject/models"
+	"os"
 	"time"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/RomanBagger/myproject.git/models"
 )
 
-var jwtkey = []byte("my secret key")
-
-type Claims struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	jwt.StandardClaims
-}
+var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 func GenerateJWT(user models.User) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
-	claims := &Claims{
-		Username: user.Username,
-		Email: user.Email,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
+	claims := &jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+		Subject:   user.Email,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtkey)
+	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		return "", err
 	}
@@ -33,12 +24,12 @@ func GenerateJWT(user models.User) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateJWT(tokenStr string) (*Claims, error) {
-	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
-		return jwtkey, nil
+func ValidateJWT(tokenString string) (*jwt.StandardClaims, error) {
+	claims := &jwt.StandardClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
 	})
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -47,5 +38,5 @@ func ValidateJWT(tokenStr string) (*Claims, error) {
 		return nil, err
 	}
 
-	return claims, err
+	return claims, nil
 }

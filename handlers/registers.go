@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"golang.org/x/crypto/bcrypt"
-	"myproject/models"
+	"github.com/RomanBagger/myproject.git/models"
 	"net/http"
 )
 
