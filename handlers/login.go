@@ -5,7 +5,6 @@ import (
 	"myproject/models"
 	"myproject/utils"
 	"net/http"
-
 	"github.com/RomanBagger/myproject.git/utils"
 	"golang.org/x/crypto/bcrypt"
 )
